@@ -18,24 +18,55 @@ $result = mysqli_stmt_get_result($stmt);
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Dashboard - Project Management System</title>
     <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 <body>
     <nav class="nav">
-        <ul class="nav-list">
-            <li class="nav-item">Welcome, <?php echo htmlspecialchars($_SESSION['name']); ?></li>
-            <li class="nav-item"><a href="submit_project.php" class="nav-link">Submit New Project</a></li>
-            <li class="nav-item"><a href="profile.php" class="nav-link">My Profile</a></li>
-            <li class="nav-item"><a href="../includes/logout.php" class="nav-link">Logout</a></li>
+        <ul class="nav-list">            <li class="nav-item user-profile">
+                <div class="user-avatar">
+                    <?php
+                    $profile_image = isset($_SESSION['profile_image']) ? htmlspecialchars($_SESSION['profile_image']) : '';
+                    if ($profile_image && file_exists("../uploads/profiles/" . $profile_image)) {
+                        echo '<img src="../uploads/profiles/' . $profile_image . '" alt="Profile">';
+                    } else {
+                        echo '<i class="fas fa-user-circle"></i>';
+                    }
+                    ?>
+                </div>
+                <div class="user-info">
+                    <span class="welcome-text">Welcome,</span>
+                    <span class="user-name"><?php echo htmlspecialchars($_SESSION['first_name'] . ' ' . $_SESSION['last_name']); ?></span>
+                </div>
+            </li>
+            <li class="nav-item">
+                <a href="dashboard.php" class="nav-link<?php echo basename($_SERVER['PHP_SELF']) == 'dashboard.php' ? ' active' : ''; ?>">
+                    <i class="fas fa-home"></i> Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="submit_project.php" class="nav-link<?php echo basename($_SERVER['PHP_SELF']) == 'submit_project.php' ? ' active' : ''; ?>">
+                    <i class="fas fa-plus-circle"></i> Submit New Project
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="profile.php" class="nav-link<?php echo basename($_SERVER['PHP_SELF']) == 'profile.php' ? ' active' : ''; ?>">
+                    <i class="fas fa-user"></i> My Profile
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="../includes/logout.php" class="nav-link">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </li>
         </ul>
     </nav>
 
-    <div class="dashboard">
+    <div class="main-content">
         <div class="dashboard-header">
-            <h2>My Projects</h2>
+            <h2><i class="fas fa-project-diagram"></i> My Projects</h2>
         </div>
 
         <?php if (isset($_SESSION['message'])): ?>

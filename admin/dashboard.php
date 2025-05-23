@@ -68,31 +68,87 @@ $pending_projects = mysqli_query($conn, $sql);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo $_SESSION['role'] === 'super_admin' ? 'Admin' : 'Sub-Admin'; ?> Dashboard - Project Management System</title>
+    <title>Admin Dashboard - Project Management System</title>
     <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
-<body>    <nav class="nav">
-        <ul class="nav-list">            <li class="nav-item">
+<body>
+    <nav class="nav">
+        <ul class="nav-list">
+            <li class="nav-item">
+                <i class="fas fa-user-shield"></i>
                 <span class="user-welcome">Welcome, <?php echo isset($_SESSION['first_name']) ? htmlspecialchars($_SESSION['first_name']) : 'User'; ?></span>
                 <span class="role-badge <?php echo $_SESSION['role']; ?>"><?php echo ucwords(str_replace('_', ' ', $_SESSION['role'])); ?></span>
             </li>
             <?php if ($_SESSION['role'] === 'super_admin'): ?>
-                <li class="nav-item"><a href="users.php" class="nav-link">Manage Users</a></li>
-                <li class="nav-item"><a href="roles.php" class="nav-link">Manage Roles</a></li>
-                <li class="nav-item"><a href="projects.php" class="nav-link">All Projects</a></li>
-                <li class="nav-item"><a href="reports.php" class="nav-link">Reports</a></li>
-                <li class="nav-item"><a href="audit_logs.php" class="nav-link">Audit Logs</a></li>
+                <li class="nav-item">
+                    <a href="dashboard.php" class="nav-link<?php echo basename($_SERVER['PHP_SELF']) == 'dashboard.php' ? ' active' : ''; ?>">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="users.php" class="nav-link<?php echo basename($_SERVER['PHP_SELF']) == 'users.php' ? ' active' : ''; ?>">
+                        <i class="fas fa-users"></i>
+                        <span>Manage Users</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="roles.php" class="nav-link<?php echo basename($_SERVER['PHP_SELF']) == 'roles.php' ? ' active' : ''; ?>">
+                        <i class="fas fa-user-tag"></i>
+                        <span>Manage Roles</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="projects.php" class="nav-link<?php echo basename($_SERVER['PHP_SELF']) == 'projects.php' ? ' active' : ''; ?>">
+                        <i class="fas fa-project-diagram"></i>
+                        <span>All Projects</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="reports.php" class="nav-link<?php echo basename($_SERVER['PHP_SELF']) == 'reports.php' ? ' active' : ''; ?>">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>Reports</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="audit_logs.php" class="nav-link<?php echo basename($_SERVER['PHP_SELF']) == 'audit_logs.php' ? ' active' : ''; ?>">
+                        <i class="fas fa-history"></i>
+                        <span>Audit Logs</span>
+                    </a>
+                </li>
             <?php else: ?>
-                <li class="nav-item"><a href="users.php" class="nav-link">User Management</a></li>
-                <li class="nav-item"><a href="projects.php" class="nav-link">Project Review</a></li>
-                <li class="nav-item"><a href="pending_approvals.php" class="nav-link">Pending Approvals</a></li>
+                <li class="nav-item">
+                    <a href="users.php" class="nav-link<?php echo basename($_SERVER['PHP_SELF']) == 'users.php' ? ' active' : ''; ?>">
+                        <i class="fas fa-users-cog"></i>
+                        <span>User Management</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="projects.php" class="nav-link<?php echo basename($_SERVER['PHP_SELF']) == 'projects.php' ? ' active' : ''; ?>">
+                        <i class="fas fa-tasks"></i>
+                        <span>Project Review</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="pending_approvals.php" class="nav-link<?php echo basename($_SERVER['PHP_SELF']) == 'pending_approvals.php' ? ' active' : ''; ?>">
+                        <i class="fas fa-clock"></i>
+                        <span>Pending Approvals</span>
+                    </a>
+                </li>
             <?php endif; ?>
-            <li class="nav-item"><a href="../includes/logout.php" class="nav-link">Logout</a></li>
-        </ul>
-    </nav>
-
-    <div class="dashboard">
-        <h2>Admin Dashboard</h2>
+            <li class="nav-item">
+                <a href="../includes/logout.php" class="nav-link">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </li>
+        </ul>   
+    </nav>    <div class="main-content">
+        <div class="dashboard-header">
+            <h2><i class="fas fa-tachometer-alt"></i> Admin Dashboard Overview</h2>
+        </div>
 
         <?php if (isset($_SESSION['message'])): ?>
             <div class="message success">

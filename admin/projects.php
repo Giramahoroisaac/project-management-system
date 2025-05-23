@@ -90,19 +90,90 @@ $total_pages = ceil($total_projects / $limit);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Projects - Project Management System</title>
+    <title>Projects - Project Management System</title>
     <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 <body>
     <nav class="nav">
         <ul class="nav-list">
-            <li class="nav-item"><a href="dashboard.php" class="nav-link">Dashboard</a></li>
-            <li class="nav-item"><a href="../includes/logout.php" class="nav-link">Logout</a></li>
-        </ul>
+            <li class="nav-item">
+                <i class="fas fa-user-shield"></i>
+                <span class="user-welcome">Welcome, <?php echo isset($_SESSION['first_name']) ? htmlspecialchars($_SESSION['first_name']) : 'User'; ?></span>
+                <span class="role-badge <?php echo $_SESSION['role']; ?>"><?php echo ucwords(str_replace('_', ' ', $_SESSION['role'])); ?></span>
+            </li>
+            <?php if ($_SESSION['role'] === 'super_admin'): ?>
+                <li class="nav-item">
+                    <a href="dashboard.php" class="nav-link<?php echo basename($_SERVER['PHP_SELF']) == 'dashboard.php' ? ' active' : ''; ?>">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="users.php" class="nav-link<?php echo basename($_SERVER['PHP_SELF']) == 'users.php' ? ' active' : ''; ?>">
+                        <i class="fas fa-users"></i>
+                        <span>Manage Users</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="roles.php" class="nav-link<?php echo basename($_SERVER['PHP_SELF']) == 'roles.php' ? ' active' : ''; ?>">
+                        <i class="fas fa-user-tag"></i>
+                        <span>Manage Roles</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="projects.php" class="nav-link<?php echo basename($_SERVER['PHP_SELF']) == 'projects.php' ? ' active' : ''; ?>">
+                        <i class="fas fa-project-diagram"></i>
+                        <span>All Projects</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="reports.php" class="nav-link<?php echo basename($_SERVER['PHP_SELF']) == 'reports.php' ? ' active' : ''; ?>">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>Reports</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="audit_logs.php" class="nav-link<?php echo basename($_SERVER['PHP_SELF']) == 'audit_logs.php' ? ' active' : ''; ?>">
+                        <i class="fas fa-history"></i>
+                        <span>Audit Logs</span>
+                    </a>
+                </li>
+            <?php else: ?>
+                <li class="nav-item">
+                    <a href="users.php" class="nav-link<?php echo basename($_SERVER['PHP_SELF']) == 'users.php' ? ' active' : ''; ?>">
+                        <i class="fas fa-users-cog"></i>
+                        <span>User Management</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="projects.php" class="nav-link<?php echo basename($_SERVER['PHP_SELF']) == 'projects.php' ? ' active' : ''; ?>">
+                        <i class="fas fa-tasks"></i>
+                        <span>Project Review</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="pending_approvals.php" class="nav-link<?php echo basename($_SERVER['PHP_SELF']) == 'pending_approvals.php' ? ' active' : ''; ?>">
+                        <i class="fas fa-clock"></i>
+                        <span>Pending Approvals</span>
+                    </a>
+                </li>
+            <?php endif; ?>
+            <li class="nav-item">
+                <a href="../includes/logout.php" class="nav-link">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </li>
+        </ul>   
     </nav>
 
-    <div class="container">
-        <h2>Manage Projects</h2>
+    <div class="main-content">
+        <div class="dashboard-header">
+            <h2><i class="fas fa-project-diagram"></i> Project Management</h2>
+            <p class="text-muted">Review and manage all submitted projects</p>
+        </div>
 
         <?php if (isset($_SESSION['message'])): ?>
             <div class="message success">
@@ -122,101 +193,88 @@ $total_pages = ceil($total_projects / $limit);
             </div>
         <?php endif; ?>
 
-        <div class="filters">
-            <form method="GET" class="search-form">
-                <input type="text" name="search" placeholder="Search projects..." value="<?php echo htmlspecialchars($search); ?>">
-                <select name="status">
-                    <option value="">All Status</option>
-                    <option value="pending" <?php echo $status_filter == 'pending' ? 'selected' : ''; ?>>Pending</option>
-                    <option value="approved" <?php echo $status_filter == 'approved' ? 'selected' : ''; ?>>Approved</option>
-                    <option value="rejected" <?php echo $status_filter == 'rejected' ? 'selected' : ''; ?>>Rejected</option>
+        <div class="project-filters">
+            <div class="form-group">
+                <select id="statusFilter" class="form-control">
+                    <option value="">All Statuses</option>
+                    <option value="pending">Pending</option>
+                    <option value="approved">Approved</option>
+                    <option value="rejected">Rejected</option>
                 </select>
-                <button type="submit" class="btn-primary">Filter</button>
-            </form>
+            </div>
         </div>
 
-        <div class="card">
+        <div class="table-responsive">
             <table class="table">
                 <thead>
                     <tr>
                         <th>Project Name</th>
                         <th>Submitted By</th>
-                        <th>Institution</th>
                         <th>Status</th>
                         <th>Submission Date</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <?php while ($project = mysqli_fetch_assoc($result)): ?>
-                    <tr>
+                    <?php
+                    // Get all projects
+                    $sql = "SELECT p.*, u.first_name, u.last_name 
+                            FROM projects p 
+                            JOIN users u ON p.user_id = u.id 
+                            ORDER BY p.created_at DESC";
+                    $projects = mysqli_query($conn, $sql);
+
+                    while ($project = mysqli_fetch_assoc($projects)):
+                        $statusClass = '';
+                        switch($project['status']) {
+                            case 'pending': $statusClass = 'badge-warning'; break;
+                            case 'approved': $statusClass = 'badge-success'; break;
+                            case 'rejected': $statusClass = 'badge-danger'; break;
+                        }
+                    ?>
+                    <tr data-status="<?php echo htmlspecialchars($project['status']); ?>">
                         <td><?php echo htmlspecialchars($project['project_name']); ?></td>
                         <td><?php echo htmlspecialchars($project['first_name'] . ' ' . $project['last_name']); ?></td>
-                        <td><?php echo htmlspecialchars($project['institution']); ?></td>
-                        <td><?php echo ucfirst($project['status']); ?></td>
+                        <td><span class="badge <?php echo $statusClass; ?>"><?php echo ucfirst($project['status']); ?></span></td>
                         <td><?php echo date('M d, Y', strtotime($project['created_at'])); ?></td>
                         <td>
-                            <a href="view_project.php?id=<?php echo $project['id']; ?>" class="btn-small">View</a>
-                            <?php if ($project['status'] == 'pending'): ?>
-                                <button onclick="showReviewModal(<?php echo $project['id']; ?>)" class="btn-small">Review</button>
-                            <?php endif; ?>
+                            <div class="action-buttons">
+                                <a href="view_project.php?id=<?php echo $project['id']; ?>" class="btn-small">
+                                    <i class="fas fa-eye"></i> View
+                                </a>
+                                <?php if ($project['status'] === 'pending'): ?>
+                                <button onclick="reviewProject(<?php echo $project['id']; ?>)" class="btn-small btn-primary">
+                                    <i class="fas fa-check"></i> Review
+                                </button>
+                                <?php endif; ?>
+                            </div>
                         </td>
                     </tr>
                     <?php endwhile; ?>
                 </tbody>
             </table>
-
-            <?php if ($total_pages > 1): ?>
-            <div class="pagination">
-                <?php for ($i = 1; $i <= $total_pages; $i++): ?>
-                    <a href="?page=<?php echo $i; ?>&search=<?php echo urlencode($search); ?>&status=<?php echo urlencode($status_filter); ?>" 
-                       class="<?php echo $page == $i ? 'active' : ''; ?>">
-                        <?php echo $i; ?>
-                    </a>
-                <?php endfor; ?>
-            </div>
-            <?php endif; ?>
         </div>
     </div>
 
-    <!-- Review Modal -->
-    <div id="reviewModal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h3>Review Project</h3>
-            <form id="reviewForm" method="POST">
-                <input type="hidden" name="project_id" id="modal_project_id">
-                <div class="form-group">
-                    <label for="comment">Comment (optional):</label>
-                    <textarea name="comment" id="comment" rows="4"></textarea>
-                </div>
-                <div class="form-actions">
-                    <button type="submit" name="action" value="approve" class="btn-primary">Approve</button>
-                    <button type="submit" name="action" value="reject" class="btn-danger">Reject</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <script src="../js/admin.js"></script>
     <script>
-        // Modal functionality
-        const modal = document.getElementById('reviewModal');
-        const span = document.getElementsByClassName('close')[0];
-        
-        function showReviewModal(projectId) {
-            document.getElementById('modal_project_id').value = projectId;
-            modal.style.display = 'block';
-        }
-        
-        span.onclick = function() {
-            modal.style.display = 'none';
-        }
-        
-        window.onclick = function(event) {
-            if (event.target == modal) {
-                modal.style.display = 'none';
-            }
+        // Filter projects by status
+        document.getElementById('statusFilter').addEventListener('change', function() {
+            const status = this.value;
+            const rows = document.querySelectorAll('tbody tr');
+            
+            rows.forEach(row => {
+                if (!status || row.dataset.status === status) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+
+        // Project review function
+        function reviewProject(projectId) {
+            // Add your review logic here
+            window.location.href = `view_project.php?id=${projectId}&action=review`;
         }
     </script>
 </body>

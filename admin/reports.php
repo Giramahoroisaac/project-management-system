@@ -114,16 +114,82 @@ $projects = $report_type == 'projects' ?
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reports - Project Management System</title>
     <link rel="stylesheet" href="../css/style.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="../css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 <body>
     <nav class="nav">
         <ul class="nav-list">
-            <li class="nav-item"><a href="dashboard.php" class="nav-link">Dashboard</a></li>
-            <li class="nav-item"><a href="../includes/logout.php" class="nav-link">Logout</a></li>
-        </ul>
+            <li class="nav-item">
+                <i class="fas fa-user-shield"></i>
+                <span class="user-welcome">Welcome, <?php echo isset($_SESSION['first_name']) ? htmlspecialchars($_SESSION['first_name']) : 'User'; ?></span>
+                <span class="role-badge <?php echo $_SESSION['role']; ?>"><?php echo ucwords(str_replace('_', ' ', $_SESSION['role'])); ?></span>
+            </li>
+            <?php if ($_SESSION['role'] === 'super_admin'): ?>
+                <li class="nav-item">
+                    <a href="dashboard.php" class="nav-link<?php echo basename($_SERVER['PHP_SELF']) == 'dashboard.php' ? ' active' : ''; ?>">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="users.php" class="nav-link<?php echo basename($_SERVER['PHP_SELF']) == 'users.php' ? ' active' : ''; ?>">
+                        <i class="fas fa-users"></i>
+                        <span>Manage Users</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="roles.php" class="nav-link<?php echo basename($_SERVER['PHP_SELF']) == 'roles.php' ? ' active' : ''; ?>">
+                        <i class="fas fa-user-tag"></i>
+                        <span>Manage Roles</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="projects.php" class="nav-link<?php echo basename($_SERVER['PHP_SELF']) == 'projects.php' ? ' active' : ''; ?>">
+                        <i class="fas fa-project-diagram"></i>
+                        <span>All Projects</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="reports.php" class="nav-link<?php echo basename($_SERVER['PHP_SELF']) == 'reports.php' ? ' active' : ''; ?>">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>Reports</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="audit_logs.php" class="nav-link<?php echo basename($_SERVER['PHP_SELF']) == 'audit_logs.php' ? ' active' : ''; ?>">
+                        <i class="fas fa-history"></i>
+                        <span>Audit Logs</span>
+                    </a>
+                </li>
+            <?php else: ?>
+                <li class="nav-item">
+                    <a href="users.php" class="nav-link<?php echo basename($_SERVER['PHP_SELF']) == 'users.php' ? ' active' : ''; ?>">
+                        <i class="fas fa-users-cog"></i>
+                        <span>User Management</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="projects.php" class="nav-link<?php echo basename($_SERVER['PHP_SELF']) == 'projects.php' ? ' active' : ''; ?>">
+                        <i class="fas fa-tasks"></i>
+                        <span>Project Review</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="pending_approvals.php" class="nav-link<?php echo basename($_SERVER['PHP_SELF']) == 'pending_approvals.php' ? ' active' : ''; ?>">
+                        <i class="fas fa-clock"></i>
+                        <span>Pending Approvals</span>
+                    </a>
+                </li>
+            <?php endif; ?>
+            <li class="nav-item">
+                <a href="../includes/logout.php" class="nav-link">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </li>
+        </ul>   
     </nav>
-
     <div class="container">
         <h2>Reports</h2>
 
@@ -150,31 +216,6 @@ $projects = $report_type == 'projects' ?
 
         <div class="report-content">
             <div class="stats-grid">
-                <?php if ($report_type == 'projects'): ?>
-                    <div class="stat-card">
-                        <h3>Project Statistics</h3>
-                        <canvas id="projectChart"></canvas>
-                        <div class="stat-details">
-                            <p>Total Projects: <?php echo $stats['total_projects']; ?></p>
-                            <p>Pending: <?php echo $stats['pending_projects']; ?></p>
-                            <p>Approved: <?php echo $stats['approved_projects']; ?></p>
-                            <p>Rejected: <?php echo $stats['rejected_projects']; ?></p>
-                        </div>
-                    </div>
-                <?php else: ?>
-                    <div class="stat-card">
-                        <h3>User Statistics</h3>
-                        <canvas id="userChart"></canvas>
-                        <div class="stat-details">
-                            <p>Total Users: <?php echo $stats['total_users']; ?></p>
-                            <p>Active: <?php echo $stats['active_users']; ?></p>
-                            <p>Pending: <?php echo $stats['pending_users']; ?></p>
-                            <p>Disabled: <?php echo $stats['disabled_users']; ?></p>
-                        </div>
-                    </div>
-                <?php endif; ?>
-            </div>
-
             <?php if ($report_type == 'projects' && $projects): ?>
             <div class="card">
                 <h3>Project Details</h3>
@@ -202,6 +243,70 @@ $projects = $report_type == 'projects' ?
                 </table>
             </div>
             <?php endif; ?>
+                <?php if ($report_type == 'projects'): ?>
+                    <div class="stat-card">
+                        <h3>Project Statistics</h3>
+                        <canvas id="projectChart"></canvas>
+                        <div class="stat-details">
+                            <p>Total Projects: <?php echo $stats['total_projects']; ?></p>
+                            <p>Pending: <?php echo $stats['pending_projects']; ?></p>
+                            <p>Approved: <?php echo $stats['approved_projects']; ?></p>
+                            <p>Rejected: <?php echo $stats['rejected_projects']; ?></p>
+                        </div>
+                    </div>
+                <?php else: ?>
+                    <div class="stat-card">
+                        <h3>User Statistics</h3>
+                        <div class="stat-chart">
+                            <canvas id="userChart"></canvas>
+                        </div>
+                        <div class="stat-details">
+                            <div class="stat-row total">
+                                <span class="stat-label">Total Users</span>
+                                <span class="stat-value"><?php echo $stats['total_users']; ?></span>
+                            </div>
+                            <?php
+                            $total = $stats['total_users'] > 0 ? $stats['total_users'] : 1;
+                            $active_percent = round(($stats['active_users'] / $total) * 100, 1);
+                            $pending_percent = round(($stats['pending_users'] / $total) * 100, 1);
+                            $disabled_percent = round(($stats['disabled_users'] / $total) * 100, 1);
+                            ?>
+                            <div class="stat-row">
+                                <div class="stat-info">
+                                    <span class="status-dot active"></span>
+                                    <span class="stat-label">Active Users</span>
+                                </div>
+                                <div class="stat-numbers">
+                                    <span class="stat-value"><?php echo $stats['active_users']; ?></span>
+                                    <span class="stat-percent">(<?php echo $active_percent; ?>%)</span>
+                                </div>
+                            </div>
+                            <div class="stat-row">
+                                <div class="stat-info">
+                                    <span class="status-dot pending"></span>
+                                    <span class="stat-label">Pending Users</span>
+                                </div>
+                                <div class="stat-numbers">
+                                    <span class="stat-value"><?php echo $stats['pending_users']; ?></span>
+                                    <span class="stat-percent">(<?php echo $pending_percent; ?>%)</span>
+                                </div>
+                            </div>
+                            <div class="stat-row">
+                                <div class="stat-info">
+                                    <span class="status-dot disabled"></span>
+                                    <span class="stat-label">Disabled Users</span>
+                                </div>
+                                <div class="stat-numbers">
+                                    <span class="stat-value"><?php echo $stats['disabled_users']; ?></span>
+                                    <span class="stat-percent">(<?php echo $disabled_percent; ?>%)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <?php endif; ?>
+            </div>
+
+            
         </div>
     </div>
 
@@ -222,9 +327,8 @@ $projects = $report_type == 'projects' ?
                 }]
             }
         });
-        <?php else: ?>
-        new Chart(document.getElementById('userChart'), {
-            type: 'pie',
+        <?php else: ?>        new Chart(document.getElementById('userChart'), {
+            type: 'doughnut',
             data: {
                 labels: ['Active', 'Pending', 'Disabled'],
                 datasets: [{
@@ -233,8 +337,37 @@ $projects = $report_type == 'projects' ?
                         <?php echo $stats['pending_users']; ?>,
                         <?php echo $stats['disabled_users']; ?>
                     ],
-                    backgroundColor: ['#28a745', '#ffd700', '#dc3545']
+                    backgroundColor: ['#28a745', '#ffd700', '#dc3545'],
+                    borderWidth: 2,
+                    borderColor: '#ffffff'
                 }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '60%',
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 20,
+                            font: {
+                                size: 12
+                            }
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const label = context.label || '';
+                                const value = context.formattedValue;
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const percentage = Math.round((context.parsed / total) * 100);
+                                return `${label}: ${value} (${percentage}%)`;
+                            }
+                        }
+                    }
+                }
             }
         });
         <?php endif; ?>

@@ -34,18 +34,42 @@ $userName = htmlspecialchars($user['full_name']);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Submit Project - Project Management System</title>
     <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 <body>
     <nav class="nav">
-        <ul class="nav-list">
-            <li class="nav-item"><a href="dashboard.php" class="nav-link">Dashboard</a></li>
-            <li class="nav-item"><a href="profile.php" class="nav-link">My Profile</a></li>
-            <li class="nav-item"><a href="../includes/logout.php" class="nav-link">Logout</a></li>
+    <ul class="nav-list">
+            <li class="nav-item">
+                <i class="fas fa-user-circle"></i>
+                Welcome, <?php echo htmlspecialchars($_SESSION['first_name'] . ' ' . $_SESSION['last_name']); ?>
+            </li>
+            <li class="nav-item">
+                <a href="dashboard.php" class="nav-link<?php echo basename($_SERVER['PHP_SELF']) == 'dashboard.php' ? ' active' : ''; ?>">
+                    <i class="fas fa-home"></i> Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="submit_project.php" class="nav-link<?php echo basename($_SERVER['PHP_SELF']) == 'submit_project.php' ? ' active' : ''; ?>">
+                    <i class="fas fa-plus-circle"></i> Submit New Project
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="profile.php" class="nav-link<?php echo basename($_SERVER['PHP_SELF']) == 'profile.php' ? ' active' : ''; ?>">
+                    <i class="fas fa-user"></i> My Profile
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="../includes/logout.php" class="nav-link">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </li>
         </ul>
-    </nav>
 
-    <div class="container">
-        <h2>Submit New Project</h2>
+    </nav>    <div class="main-content">
+        <div class="dashboard-header">
+            <h2><i class="fas fa-plus-circle"></i> Submit New Project</h2>
+            <p class="text-muted">Please fill in all required information for your project submission</p>
+        </div>
 
         <?php if (isset($_SESSION['error'])): ?>
             <div class="message error">
@@ -56,54 +80,84 @@ $userName = htmlspecialchars($user['full_name']);
             </div>
         <?php endif; ?>
 
-        <div class="card">
-            <form action="../includes/project_process.php" method="POST" enctype="multipart/form-data" onsubmit="return validateProjectForm(this);">
+        <div class="project-form-card">
+            <form action="../includes/project_process.php" method="POST" enctype="multipart/form-data" onsubmit="return validateProjectForm(this);">             <div class="form-section">
+                    <h3 class="form-section-title">Basic Information</h3>
+                    <div class="form-group">
+                        <label for="name_of_user">Name of User</label>
+                        <input type="text" id="name_of_user" name="name_of_user" value="<?php echo $userName; ?>" readonly class="readonly-input">
+                        <input type="hidden" name="user_id" value="<?php echo $userId; ?>">
+                    </div>   
 
-                 <div class="form-group">
-                    <label for="name_of_user">Name of User</label>
-                    <input type="text" id="name_of_user" name="name_of_user" value="<?php echo $userName; ?>" readonly class="readonly-input">
-                    <input type="hidden" name="user_id" value="<?php echo $userId; ?>">
-                </div>   
+                    <div class="form-group">
+                        <label for="project_name">Project Name *</label>
+                        <input type="text" id="project_name" name="project_name" required 
+                               placeholder="Enter your project name">
+                    </div>  
+                </div>
 
-                <div class="form-group">
-                    <label for="project_name">Project Name *</label>
-                    <input type="text" id="project_name" name="project_name" required>
-                </div>  
-
-                
-                <div class="form-group">
-                    <label for="description">Project Description *</label>
-                    <textarea id="description" name="description" rows="6" minlength="100" maxlength="2000" 
-                        placeholder="Provide a detailed description of your project including its objectives, methodology, and expected outcomes..." 
-                        required></textarea>
-                    <div class="textarea-footer">
-                        <small class="description-guide">Minimum 100 characters, maximum 2000 characters</small>
-                        <span class="char-count" id="descriptionCount">0 / 2000</span>
+                <div class="form-section">
+                    <h3 class="form-section-title">Project Details</h3>
+                    <div class="form-group">
+                        <label for="description">Project Description *</label>
+                        <div class="textarea-container">
+                            <textarea id="description" name="description" rows="6" minlength="100" maxlength="2000" 
+                                placeholder="Provide a detailed description of your project including:
+• Project objectives and goals
+• Methodology and approach
+• Expected outcomes and impact
+• Timeline and milestones
+• Required resources" required></textarea>
+                            <div class="textarea-footer">
+                                <small class="description-guide">Minimum 100 characters, maximum 2000 characters</small>
+                                <span class="char-count" id="descriptionCount">0 / 2000</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <label for="institution">Institution *</label>
-                    <input type="text" id="institution" name="institution" required>
+                <div class="form-section">
+                    <h3 class="form-section-title">Contact Information</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="institution">Institution *</label>
+                            <input type="text" id="institution" name="institution" required 
+                                   placeholder="Enter your institution name">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="location">Location *</label>
+                            <input type="text" id="location" name="location" required 
+                                   placeholder="Enter project location">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="contact">Contact Information *</label>
+                            <input type="text" id="contact" name="contact" required 
+                                   placeholder="Enter your contact details">
+                        </div>
+                    </div>
                 </div>
 
-                <div class="form-group">
-                    <label for="location">Location *</label>
-                    <input type="text" id="location" name="location" required>
+                <div class="form-section">
+                    <h3 class="form-section-title">Project Files</h3>
+                    <div class="file-upload-container" id="dropZone">
+                        <div class="file-upload-icon">📁</div>
+                        <input type="file" id="project_files" name="project_files[]" multiple 
+                               accept=".pdf,.doc,.docx,.txt,.zip" required class="hidden-input">
+                        <label for="project_files">
+                            Drag & drop files here or click to browse
+                        </label>
+                        <div class="file-requirements">
+                            <strong>Requirements:</strong><br>
+                            • Maximum file size: 10MB per file<br>
+                            • Allowed formats: PDF, DOC, DOCX, TXT, ZIP
+                        </div>
+                    </div>
+                    <div id="fileList" class="file-list"></div>
                 </div>
 
-                <div class="form-group">
-                    <label for="contact">Contact Information *</label>
-                    <input type="text" id="contact" name="contact" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="project_files">Project Files (Max 10MB per file) *</label>
-                    <input type="file" id="project_files" name="project_files[]" multiple accept=".pdf,.doc,.docx,.txt,.zip" required>
-                    <small>Allowed file types: PDF, DOC, DOCX, TXT, ZIP</small>
-                </div>
-
-                <button type="submit" class="btn-primary">Submit Project</button>
+                <button type="submit" class="btn-submit-project">Submit Project</button>
             </form>
         </div>
     </div>
