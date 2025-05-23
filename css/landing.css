@@ -34,9 +34,15 @@
     font-weight: bold;
     text-decoration: none;
 }
+.logo a {
+
+    color: var(--text-light);
+    text-decoration: none;
+}
 
 .logo i {
     margin-right: 0.5rem;
+    
 }
 
 .nav-menu {
@@ -58,21 +64,23 @@
 
 .nav-menu a:hover {
     background-color: var(--secondary-color);
+    
 }
 
 /* Hero Section */
 .hero {
     padding-top: 100px;
     min-height: 100vh;
-    background-image: url(../assets/Using-AI-in-Project-Management-Key-Applications-and-Benefits_SOCIAL.png);
-   
+    background-image: url(../assets/holiday.jpg);
+    background-repeat: no-repeat;
+    background-position: right top;
     display: flex;
     align-items: center;
 }
 
 .hero-container {
     max-width: 1200px;
-    margin: 0 auto;
+    margin: 5rem;
     padding: 2rem;
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -81,7 +89,7 @@
 }
 
 .hero-content {
-    color: var(--text-dark);
+    color: var(--text-light);
 }
 
 .hero-content h1 {
@@ -94,7 +102,7 @@
     font-size: 1.1rem;
     line-height: 1.6;
     margin-bottom: 2rem;
-    color: #555;
+    color: var(--text-light);
 }
 
 .hero-image {
@@ -113,7 +121,7 @@
     padding: 1rem 2rem;
     background-color: var(--secondary-color);
     color: var(--text-light);
-    text-decoration: none;
+    text-decoration:none;
     border-radius: 5px;
     font-weight: bold;
     transition: var(--transition);
@@ -122,6 +130,7 @@
 .cta-button:hover {
     background-color: #2980b9;
     transform: translateY(-2px);
+    text-decoration:none;
 }
 
 .features {

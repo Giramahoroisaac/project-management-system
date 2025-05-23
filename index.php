@@ -11,7 +11,7 @@
 <body>
     <header class="landing-header">
         <nav class="nav-container">
-            <a href="index.php" class="logo">
+            <a href="index.php" class="logo" style="text-decoration: none;">
                 <i class="fas fa-project-diagram"></i>
                 ProjectFlow
             </a>

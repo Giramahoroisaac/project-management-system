@@ -15,7 +15,8 @@ if (isset($_SESSION['user_id'])) {
     <title>Login - Project Management System</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
-<body>    <div class="login-container">
+<body style="background-image: url(assets/holiday.jpg);"> 
+       <div class="login-container" style="margin-top: 200px;">
         <h2>Login</h2>
         <?php if (isset($_SESSION['error'])): ?>
             <div class="message error">
